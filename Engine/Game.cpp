@@ -1,5 +1,5 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
+/******************************************************************************************
+ *	Chili DirectX Framework Version 16.07.20											  *
  *	Game.cpp																			  *
  *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
  *																						  *
@@ -22,31 +22,31 @@
 #include "Game.h"
 #include "SpriteCodex.h"
 
-Game::Game( MainWindow& wnd )
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd ),
-	brd( settings,gfx ),
-	rng( std::random_device()() ),
-	snek( {2,2} ),
-	nPoison( settings.GetPoisonAmount() ),
-	nFood( settings.GetFoodAmount() ),
-	snekSpeedupFactor( settings.GetSpeedupRate() )
+	wnd(wnd),
+	gfx(wnd),
+	brd(settings, gfx),
+	rng(std::random_device()()),
+	snek({ 2,2 }),
+	nPoison(settings.GetPoisonAmount()),
+	nFood(settings.GetFoodAmount()),
+	snekSpeedupFactor(settings.GetSpeedupRate())
 {
-	for( int i = 0; i < nPoison; i++ )
+	for (int i = 0; i < nPoison; i++)
 	{
-		brd.SpawnContents( rng,snek,Board::CellContents::Poison );
+		brd.SpawnContents(rng, snek, Board::CellContents::Poison);
 	}
-	for( int i = 0; i < nFood; i++ )
+	for (int i = 0; i < nFood; i++)
 	{
-		brd.SpawnContents( rng,snek,Board::CellContents::Food );
+		brd.SpawnContents(rng, snek, Board::CellContents::Food);
 	}
-	sndTitle.Play( 1.0f,1.0f );
+	sndTitle.Play(1.0f, 1.0f);
 }
 
 void Game::Go()
 {
-	gfx.BeginFrame();	
+	gfx.BeginFrame();
 	UpdateModel();
 	ComposeFrame();
 	gfx.EndFrame();
@@ -55,95 +55,117 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	const float dt = ft.Mark();
-	
-	if( gameIsStarted )
+
+	if (gameIsStarted)
 	{
-		if( !gameIsOver )
+		if (!gameIsOver)
 		{
-			if( wnd.kbd.KeyIsPressed( VK_UP ) )
+			if (wnd.kbd.KeyIsPressed(VK_UP))
 			{
-				delta_loc = { 0,-1 };
+				const Location new_delta_loc = { 0,-1 };
+				if (delta_loc != -new_delta_loc || snek.GetLength() <= 2) {
+					delta_loc = new_delta_loc;
+				}
 			}
-			else if( wnd.kbd.KeyIsPressed( VK_DOWN ) )
+			else if (wnd.kbd.KeyIsPressed(VK_DOWN))
 			{
-				delta_loc = { 0,1 };
+				const Location new_delta_loc = { 0,1 };
+				if (delta_loc != -new_delta_loc || snek.GetLength() <= 2) {
+				delta_loc = new_delta_loc;
+				}
 			}
-			else if( wnd.kbd.KeyIsPressed( VK_LEFT ) )
+			else if (wnd.kbd.KeyIsPressed(VK_LEFT))
 			{
-				delta_loc = { -1,0 };
+				const Location new_delta_loc = { -1,0 };
+				if (delta_loc != -new_delta_loc || snek.GetLength() <= 2) {
+				delta_loc = new_delta_loc;
+				}
 			}
-			else if( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
+			else if (wnd.kbd.KeyIsPressed(VK_RIGHT))
 			{
-				delta_loc = { 1,0 };
+				const Location new_delta_loc = { 1,0 };
+				if (delta_loc != -new_delta_loc || snek.GetLength() <= 2) {
+				delta_loc = new_delta_loc;
+				}
 			}
 
 			float snekModifiedMovePeriod = snekMovePeriod;
-			if( wnd.kbd.KeyIsPressed( VK_CONTROL ) )
+			if (wnd.kbd.KeyIsPressed(VK_CONTROL))
 			{
-				snekModifiedMovePeriod = std::min( snekMovePeriod,snekMovePeriodSpeedup );
+				snekModifiedMovePeriod = std::min(snekMovePeriod, snekMovePeriodSpeedup);
 			}
 
 			snekMoveCounter += dt;
-			if( snekMoveCounter >= snekModifiedMovePeriod )
+			if (snekMoveCounter >= snekModifiedMovePeriod)
 			{
 				snekMoveCounter -= snekModifiedMovePeriod;
-				const Location next = snek.GetNextHeadLocation( delta_loc );
-				const Board::CellContents contents = brd.GetContents( next );
-				if( !brd.IsInsideBoard( next ) ||
-					snek.IsInTileExceptEnd( next ) ||
-					contents == Board::CellContents::Obstacle )
-				{
+				const Location next = snek.GetNextHeadLocation(delta_loc);
+
+				if (!brd.IsInsideBoard(next)) {
 					gameIsOver = true;
-					sndFart.Play( rng,1.2f );
+					sndFart.Play(rng, 1.2f);
 					sndMusic.StopAll();
 				}
-				else if( contents == Board::CellContents::Food )
-				{
-					snek.GrowAndMoveBy( delta_loc );
-					brd.ConsumeContents( next );
-					brd.SpawnContents( rng,snek,Board::CellContents::Obstacle );
-					brd.SpawnContents( rng,snek,Board::CellContents::Food );
-					sfxEat.Play( rng,0.8f );
+				else {
+					const Board::CellContents contents = brd.GetContents(next);
+					if (snek.IsInTileExceptEnd(next) ||
+						contents == Board::CellContents::Obstacle)
+					{
+						gameIsOver = true;
+						sndFart.Play(rng, 1.2f);
+						sndMusic.StopAll();
+					}
+					else if (contents == Board::CellContents::Food)
+					{
+						snek.GrowAndMoveBy(delta_loc);
+						brd.ConsumeContents(next);
+						brd.SpawnContents(rng, snek, Board::CellContents::Obstacle);
+						brd.SpawnContents(rng, snek, Board::CellContents::Food);
+						sfxEat.Play(rng, 0.8f);
+					}
+					else if (contents == Board::CellContents::Poison)
+					{
+						snek.MoveBy(delta_loc);
+						brd.ConsumeContents(next);
+						snekMovePeriod = std::max(snekMovePeriod * snekSpeedupFactor, snekMovePeriodMin);
+						sndFart.Play(rng, 0.6f);
+					}
+					else
+					{
+						snek.MoveBy(delta_loc);
+						sfxSlither.Play(rng, 0.08f);
+					}
 				}
-				else if( contents == Board::CellContents::Poison )
-				{
-					snek.MoveBy( delta_loc );
-					brd.ConsumeContents( next );
-					snekMovePeriod = std::max( snekMovePeriod * snekSpeedupFactor,snekMovePeriodMin );
-					sndFart.Play( rng,0.6f );
-				}
-				else
-				{
-					snek.MoveBy( delta_loc );
-					sfxSlither.Play( rng,0.08f );
-				}
-			}
+
+			} //end of: if( snekMoveCounter >= snekModifiedMovePeriod )
+
 		}
 	}
 	else
 	{
-		if( wnd.kbd.KeyIsPressed( VK_RETURN ) )
+		if (wnd.kbd.KeyIsPressed(VK_RETURN))
 		{
-			sndMusic.Play( 1.0f,0.6f );
+			sndMusic.Play(1.0f, 0.6f);
 			gameIsStarted = true;
 		}
 	}
 }
 
+
 void Game::ComposeFrame()
 {
-	if( gameIsStarted )
+	if (gameIsStarted)
 	{
-		snek.Draw( brd );
+		snek.Draw(brd);
 		brd.DrawCells();
-		if( gameIsOver )
+		if (gameIsOver)
 		{
-			SpriteCodex::DrawGameOver( 350,265,gfx );
+			SpriteCodex::DrawGameOver(350, 265, gfx);
 		}
 		brd.DrawBorder();
 	}
 	else
 	{
-		SpriteCodex::DrawTitle( 290,225,gfx );
+		SpriteCodex::DrawTitle(290, 225, gfx);
 	}
 }

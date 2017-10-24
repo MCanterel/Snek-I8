@@ -52,7 +52,7 @@ void Snake::Draw( Board & brd ) const
 
 bool Snake::IsInTileExceptEnd( const Location& target ) const
 {
-	for( int i = 0; i < nSegments - 1; ++i )
+	for( int i = 0; i < segments.size()-1; ++i )
 	{
 		if( segments[i].GetLocation() == target )
 		{
@@ -78,6 +78,11 @@ bool Snake::IsInTile( const Location& target ) const
 	//	}
 	//}
 	return false;
+}
+
+size_t Snake::GetLength() const
+{
+	return segments.size();
 }
 
 //void Snake::Segment::InitHead( const Location& in_loc )

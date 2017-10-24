@@ -19,6 +19,9 @@
     <Filter Include="Sounds">
       <UniqueIdentifier>{e3461471-414b-4404-b55e-16b95a6cafae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{34d233b3-da8c-4d64-989f-19489969cc3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -159,6 +162,8 @@
     </Media>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Settings.txt" />
+    <Text Include="Settings.txt">
+      <Filter>Settings</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -29,6 +29,7 @@ public:
 	void Draw( Board& brd ) const;
 	bool IsInTileExceptEnd( const Location& target ) const;
 	bool IsInTile( const Location& target ) const;
+	size_t GetLength() const;
 
 private:
 	static constexpr int nBodyColors = 4;
@@ -41,5 +42,5 @@ private:
 	static constexpr Color headColor = Colors::Yellow;
 	static constexpr int nSegmentsMax = 100;
 	std::vector <Segment> segments; // [nSegmentsMax];
-	int nSegments = 1;
+	//int nSegments = 1;
 };
