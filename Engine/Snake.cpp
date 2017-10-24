@@ -3,29 +3,23 @@
 
 Snake::Snake( const Location& loc )
 {
-	constexpr int nBodyColors = 4;
-	constexpr Color bodyColors[nBodyColors] = {		
-		{ 10,100,32 },
-		{ 10,130,48 },
-		{ 18,160,48 },
-		{ 10,130,48 }
-	};
+	segments.emplace_back(loc);
 		
-	for( int i = 0; i < nSegmentsMax; ++i )
+	/*for( int i = 0; i < nSegmentsMax; ++i )
 	{
 		segments[i].InitBody( bodyColors[i % nBodyColors] );
 	}
 
-	segments[0].InitHead( loc );
+	segments[0].InitHead( loc );*/
 }
 
 void Snake::MoveBy( const Location& delta_loc )
 {
-	for( int i = nSegments - 1; i > 0; --i )
+	for( size_t i = segments.size() - 1; i > 0; --i )
 	{
 		segments[i].Follow( segments[i - 1] );
 	}
-	segments[0].MoveBy( delta_loc );
+	segments.front().MoveBy( delta_loc );
 }
 
 Location Snake::GetNextHeadLocation( const Location& delta_loc ) const
@@ -37,19 +31,23 @@ Location Snake::GetNextHeadLocation( const Location& delta_loc ) const
 
 void Snake::GrowAndMoveBy( const Location& delta_loc )
 {
-	if( nSegments < nSegmentsMax )
+	/*if( nSegments < nSegmentsMax )
 	{
 		++nSegments;
-	}
+	}*/
+	segments.emplace_back(bodyColors[segments.size() % nBodyColors]);
 	MoveBy( delta_loc );
 }
 
 void Snake::Draw( Board & brd ) const
 {
-	for( int i = 0; i < nSegments; ++i )
+	for (const Segment& e : segments) {
+		e.Draw(brd);
+	}
+	/*for( int i = 0; i < nSegments; ++i )
 	{
 		segments[i].Draw( brd );
-	}
+	}*/
 }
 
 bool Snake::IsInTileExceptEnd( const Location& target ) const
@@ -66,23 +64,40 @@ bool Snake::IsInTileExceptEnd( const Location& target ) const
 
 bool Snake::IsInTile( const Location& target ) const
 {
-	for( int i = 0; i < nSegments; ++i )
-	{
-		if( segments[i].GetLocation() == target )
+	for (Segment e : segments) {
+		if (e.GetLocation() == target)
 		{
 			return true;
 		}
 	}
+	//for( int i = 0; i < nSegments; ++i )  //range based here
+	//{
+	//	if( segments[i].GetLocation() == target )
+	//	{
+	//		return true;
+	//	}
+	//}
 	return false;
 }
 
-void Snake::Segment::InitHead( const Location& in_loc )
+//void Snake::Segment::InitHead( const Location& in_loc )
+//{
+//	loc = in_loc;
+//	c = Snake::headColor;
+//}
+//
+//void Snake::Segment::InitBody( Color c_in )
+//{
+//	c = c_in;
+//}
+
+Snake::Segment::Segment(const Location & _loc)
 {
-	loc = in_loc;
+	loc = _loc;
 	c = Snake::headColor;
 }
 
-void Snake::Segment::InitBody( Color c_in )
+Snake::Segment::Segment(Color c_in)
 {
 	c = c_in;
 }

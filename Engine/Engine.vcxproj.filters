@@ -158,4 +158,7 @@
       <Filter>Sounds</Filter>
     </Media>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Settings.txt" />
+  </ItemGroup>
 </Project>
